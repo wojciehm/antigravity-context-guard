@@ -1,0 +1,12 @@
+{
+  "context-guard-monitor": {
+    "enabled": true,
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "python3 ./scripts/context_monitor.py",
+        "timeout": 5
+      }
+    ]
+  }
+}

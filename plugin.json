@@ -1,0 +1,16 @@
+{
+  "name": "context-guard",
+  "displayName": "Context Guard (Strategic Compact)",
+  "version": "1.0.0",
+  "description": "Monitors session token usage in real time against Antigravity's ~125k auto-compact threshold, displays non-intrusive inline alerts at 70% and 85%, and guides strategic /compact checkpoints.",
+  "author": {
+    "name": "Wojciech Marusiak",
+    "url": "https://wojcieh.net"
+  },
+  "logo": "assets/logo.svg",
+  "suggestedPrompts": [
+    "Sprawdź aktualne zużycie tokenów i budżetu kontekstu w tej sesji",
+    "Pokaż statystyki i historię auto-compact dla moich ostatnich czatów",
+    "Zrób podsumowanie stanu prac przed ręcznym wywołaniem /compact"
+  ]
+}
