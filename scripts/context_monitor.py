@@ -125,26 +125,26 @@ def build_progress_bar(pct: int, width: int = 16) -> str:
 def format_banner(total: int, ceiling: int, level: str) -> str:
     pct = round((total / ceiling) * 100)
     bar = build_progress_bar(pct)
-    total_fmt = f"{total:,}".replace(",", " ")
-    ceil_fmt = f"{ceiling:,}".replace(",", " ")
+    total_fmt = f"{total:,}"
+    ceil_fmt = f"{ceiling:,}"
 
     if total >= ceiling:
-        over_fmt = f"{total - ceiling:,}".replace(",", " ")
-        headroom_str = f"*(przekroczono próg o +{over_fmt} tokenów!)*"
+        over_fmt = f"{total - ceiling:,}"
+        headroom_str = f"*(exceeded ceiling by +{over_fmt} tokens!)*"
     else:
-        rem_fmt = f"{ceiling - total:,}".replace(",", " ")
-        headroom_str = f"*(zapas ~{rem_fmt} do auto-compactu)*"
+        rem_fmt = f"{ceiling - total:,}"
+        headroom_str = f"*(~{rem_fmt} tokens left before auto-compact)*"
 
     if level == "crit":
         return (
-            f"> 🔴 **Context Guard — Poziom Krytyczny (`{pct}%`)**  \n"
-            f"> `[{bar}]` **{total_fmt} / ~{ceil_fmt} tokenów** {headroom_str}  \n"
-            f"> Dobry moment na strategiczny **`/compact`** po zamknięciu bieżącego wątku."
+            f"> 🔴 **Context Guard — Critical Level (`{pct}%`)**  \n"
+            f"> `[{bar}]` **{total_fmt} / ~{ceil_fmt} tokens** {headroom_str}  \n"
+            f"> Run **`/compact`** after finishing the current task to avoid mid-task truncation."
         )
     return (
-        f"> 🟡 **Context Guard — Ostrzeżenie (`{pct}%`)**  \n"
-        f"> `[{bar}]` **{total_fmt} / ~{ceil_fmt} tokenów** {headroom_str}  \n"
-        f"> Dobry moment na strategiczny **`/compact`** po zamknięciu bieżącego wątku."
+        f"> 🟡 **Context Guard — Warning (`{pct}%`)**  \n"
+        f"> `[{bar}]` **{total_fmt} / ~{ceil_fmt} tokens** {headroom_str}  \n"
+        f"> Good checkpoint to run **`/compact`** once the current task is complete."
     )
 
 

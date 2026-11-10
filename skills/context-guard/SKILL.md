@@ -23,11 +23,11 @@ python3 ~/.gemini/config/plugins/context-guard/scripts/context_status.py --top 5
 
 ### How to Present Results (MANDATORY VISUAL FORMAT)
 1. **Always start your response** by outputting the exact `banner_markdown` returned by `context_status.py` verbatim at the very top of your message:
-   > 🟡 **Context Guard — Ostrzeżenie (`68%`)**  
-   > `[███████████░░░░░]` **85 400 / ~125 000 tokenów** *(zapas ~39 600 do auto-compactu)*  
-   > Dobry moment na strategiczny **`/compact`** po zamknięciu bieżącego wątku.
+   > 🟡 **Context Guard — Warning (`68%`)**  
+   > `[███████████░░░░░]` **85,400 / ~125,000 tokens** *(~39,600 tokens left before auto-compact)*  
+   > Good checkpoint to run **`/compact`** once the current task is complete.
 2. Below the visual banner, present a concise Markdown table with:
-   - **Active Context**: `active_tokens` / `125 000` (`ceiling_pct%`) — broken down into cached tokens (`cache_read_tokens`, `cache_hit_pct%`) and fresh `input_tokens`.
+   - **Active Context**: `active_tokens` / `125,000` (`ceiling_pct%`) — broken down into cached tokens (`cache_read_tokens`, `cache_hit_pct%`) and fresh `input_tokens`.
    - **Headroom**: `remaining_to_autocompact` tokens left before Antigravity forces an automatic `CHECKPOINT`.
    - **Compaction History**: Number of manual `/compact` vs automatic `AUTO-COMPACT` checkpoints in the thread.
 

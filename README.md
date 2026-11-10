@@ -9,9 +9,9 @@ Google Antigravity automatically compacts conversation history (`CHECKPOINT`) on
 `context-guard` reads the tail of `transcript.jsonl` before each user turn (`PreInvocation`, `< 5 ms`) and renders a visual progress gauge once your session crosses `85,000` tokens (`68%`), so you can run `/compact` manually at logical task boundaries instead of losing context mid-task.
 
 ```markdown
-> 🟡 **Context Guard — Ostrzeżenie (`68%`)**  
-> `[███████████░░░░░]` **85 400 / ~125 000 tokenów** *(zapas ~39 600 do auto-compactu)*  
-> Dobry moment na strategiczny **`/compact`** po zamknięciu bieżącego wątku.
+> 🟡 **Context Guard — Warning (`68%`)**  
+> `[███████████░░░░░]` **85,400 / ~125,000 tokens** *(~39,600 tokens left before auto-compact)*  
+> Good checkpoint to run **`/compact`** once the current task is complete.
 ```
 
 ## Features

@@ -28,29 +28,29 @@ def build_progress_bar(pct: float, width: int = 16) -> str:
 def build_banner(total: int, ceiling: int) -> str:
     pct = round((total / ceiling) * 100)
     bar = build_progress_bar(pct)
-    total_fmt = f"{total:,}".replace(",", " ")
-    ceil_fmt = f"{ceiling:,}".replace(",", " ")
+    total_fmt = f"{total:,}"
+    ceil_fmt = f"{ceiling:,}"
 
     if total >= ceiling:
-        over_fmt = f"{total - ceiling:,}".replace(",", " ")
-        headroom_str = f"*(przekroczono próg o +{over_fmt} tokenów!)*"
+        over_fmt = f"{total - ceiling:,}"
+        headroom_str = f"*(exceeded ceiling by +{over_fmt} tokens!)*"
     else:
-        rem_fmt = f"{ceiling - total:,}".replace(",", " ")
-        headroom_str = f"*(zapas ~{rem_fmt} do auto-compactu)*"
+        rem_fmt = f"{ceiling - total:,}"
+        headroom_str = f"*(~{rem_fmt} tokens left before auto-compact)*"
 
     if total >= CRIT_THRESHOLD:
-        icon, label = "🔴", "Poziom Krytyczny"
-        footer = "Zalecany natychmiastowy **`/compact`** po zamknięciu bieżącego wątku."
+        icon, label = "🔴", "Critical Level"
+        footer = "Run **`/compact`** after finishing the current task to avoid mid-task truncation."
     elif total >= WARN_THRESHOLD:
-        icon, label = "🟡", "Ostrzeżenie"
-        footer = "Dobry moment na strategiczny **`/compact`** po zamknięciu bieżącego wątku."
+        icon, label = "🟡", "Warning"
+        footer = "Good checkpoint to run **`/compact`** once the current task is complete."
     else:
-        icon, label = "🟢", "Poziom Optymalny"
-        footer = "Bezpieczny zapas okna kontekstowego — kompresja nie jest jeszcze potrzebna."
+        icon, label = "🟢", "Optimal"
+        footer = "Healthy context window headroom — no compaction needed yet."
 
     return (
         f"> {icon} **Context Guard — {label} (`{pct}%`)**  \n"
-        f"> `[{bar}]` **{total_fmt} / ~{ceil_fmt} tokenów** {headroom_str}  \n"
+        f"> `[{bar}]` **{total_fmt} / ~{ceil_fmt} tokens** {headroom_str}  \n"
         f"> {footer}"
     )
 
