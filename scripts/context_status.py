@@ -14,9 +14,9 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8")
 
 BRAIN_DIR = Path.home() / ".gemini" / "antigravity" / "brain"
-AUTO_COMPACT_CEILING = 125000
-WARN_THRESHOLD = 85000
-CRIT_THRESHOLD = 105000
+AUTO_COMPACT_CEILING = 256000
+WARN_THRESHOLD = 175000
+CRIT_THRESHOLD = 225000
 
 
 def build_progress_bar(pct: float, width: int = 16) -> str:
@@ -36,17 +36,17 @@ def build_banner(total: int, ceiling: int) -> str:
         headroom_str = f"*(exceeded ceiling by +{over_fmt} tokens!)*"
     else:
         rem_fmt = f"{ceiling - total:,}"
-        headroom_str = f"*(~{rem_fmt} tokens left before auto-compact)*"
+        headroom_str = f"*(~{rem_fmt} tokens left before ~256k auto-compact)*"
 
     if total >= CRIT_THRESHOLD:
         icon, label = "🔴", "Critical Level"
-        footer = "Run **`/compact`** after finishing the current task to avoid mid-task truncation."
+        footer = "Run **`/compact`** when switching topics or finishing the current task to avoid mid-task truncation."
     elif total >= WARN_THRESHOLD:
         icon, label = "🟡", "Warning"
-        footer = "Good checkpoint to run **`/compact`** once the current task is complete."
+        footer = "Keep going if on the same task; run **`/compact`** only when switching to a new topic."
     else:
         icon, label = "🟢", "Optimal"
-        footer = "Healthy context window headroom — no compaction needed yet."
+        footer = "Healthy context window headroom — no compaction needed."
 
     return (
         f"> {icon} **Context Guard — {label} (`{pct}%`)**  \n"

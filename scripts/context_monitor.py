@@ -4,7 +4,7 @@ Antigravity PreInvocation Hook: Context Guard (Strategic Compact Monitor)
 Reads the active conversation's transcript.jsonl tail, computes total active context
 (input_tokens + cache_read_tokens), and injects an ephemeral instruction so the agent
 renders the visual Context Guard progress bar at the top of its reply when approaching
-or exceeding Antigravity's ~125k auto-compact threshold.
+or exceeding Antigravity's ~256k Gemini 4 auto-compact threshold.
 
 NOTE: Do not use `systemMessage.metadata` here — Antigravity's Go `utils.scrubMessage`
 (`proto_utils.go:34`) panics (`cannot convert string to message`) when iterating over
@@ -19,9 +19,9 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-AUTO_COMPACT_CEILING = int(os.environ.get("AGY_COMPACT_CEILING", "125000"))
-WARN_THRESHOLD = int(os.environ.get("AGY_COMPACT_WARN", "85000"))    # ~68%
-CRIT_THRESHOLD = int(os.environ.get("AGY_COMPACT_CRIT", "105000"))   # ~84%
+AUTO_COMPACT_CEILING = int(os.environ.get("AGY_COMPACT_CEILING", "256000"))
+WARN_THRESHOLD = int(os.environ.get("AGY_COMPACT_WARN", "175000"))    # ~68%
+CRIT_THRESHOLD = int(os.environ.get("AGY_COMPACT_CRIT", "225000"))    # ~88%
 
 STATE_DIR = Path("/tmp/agy-context-guard")
 
@@ -133,18 +133,18 @@ def format_banner(total: int, ceiling: int, level: str) -> str:
         headroom_str = f"*(exceeded ceiling by +{over_fmt} tokens!)*"
     else:
         rem_fmt = f"{ceiling - total:,}"
-        headroom_str = f"*(~{rem_fmt} tokens left before auto-compact)*"
+        headroom_str = f"*(~{rem_fmt} tokens left before ~256k auto-compact)*"
 
     if level == "crit":
         return (
             f"> 🔴 **Context Guard — Critical Level (`{pct}%`)**  \n"
             f"> `[{bar}]` **{total_fmt} / ~{ceil_fmt} tokens** {headroom_str}  \n"
-            f"> Run **`/compact`** after finishing the current task to avoid mid-task truncation."
+            f"> Run **`/compact`** when switching topics or finishing the current task to avoid mid-task truncation."
         )
     return (
         f"> 🟡 **Context Guard — Warning (`{pct}%`)**  \n"
         f"> `[{bar}]` **{total_fmt} / ~{ceil_fmt} tokens** {headroom_str}  \n"
-        f"> Good checkpoint to run **`/compact`** once the current task is complete."
+        f"> Keep going if on the same task; run **`/compact`** only when switching to a new topic."
     )
 
 
@@ -190,14 +190,14 @@ def main() -> None:
         level = "crit"
         if (
             state.get("last_level") != "crit"
-            or (total - int(state.get("last_tokens", 0))) >= 8000
+            or (total - int(state.get("last_tokens", 0))) >= 20000
         ):
             should_notify = True
     else:
         level = "warn"
         if (
             state.get("last_level") == "none"
-            or (total - int(state.get("last_tokens", 0))) >= 10000
+            or (total - int(state.get("last_tokens", 0))) >= 25000
         ):
             should_notify = True
 

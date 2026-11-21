@@ -4,22 +4,22 @@ Real-time session token telemetry and strategic `/compact` lifecycle hook plugin
 
 ## Why This Exists
 
-Google Antigravity automatically compacts conversation history (`CHECKPOINT`) once active context (`input_tokens + cache_read_tokens`) reaches roughly **124,000–128,000 tokens**. Because the built-in threshold fires strictly on token count, it often truncates context in the middle of a multi-step debugging loop right after a large tool output.
+Google Antigravity automatically compacts conversation history (`CHECKPOINT`) once active context (`input_tokens + cache_read_tokens`) reaches roughly **250,000–256,000 tokens** on Gemini 4 models (or **124,000–128,000 tokens** on smaller/Flash models). Because the built-in threshold fires strictly on token count, it can truncate context in the middle of a multi-step debugging loop right after a large tool output.
 
-`context-guard` reads the tail of `transcript.jsonl` before each user turn (`PreInvocation`, `< 5 ms`) and renders a visual progress gauge once your session crosses `85,000` tokens (`68%`), so you can run `/compact` manually at logical task boundaries instead of losing context mid-task.
+At the same time, running `/compact` too early hurts accuracy because compaction is lossy and discards cached file/log reads. `context-guard` reads the tail of `transcript.jsonl` before each user turn (`PreInvocation`, `< 5 ms`) and stays completely silent until your session crosses `175,000` tokens (`68%` of the 256k ceiling), advising you to keep going if you are on the same task and only run `/compact` when switching topics or approaching `225,000` tokens (`88%`).
 
 ```markdown
 > 🟡 **Context Guard — Warning (`68%`)**  
-> `[███████████░░░░░]` **85,400 / ~125,000 tokens** *(~39,600 tokens left before auto-compact)*  
-> Good checkpoint to run **`/compact`** once the current task is complete.
+> `[███████████░░░░░]` **175,400 / ~256,000 tokens** *(~80,600 tokens left before ~256k auto-compact)*  
+> Keep going if on the same task; run **`/compact`** only when switching to a new topic.
 ```
 
 ## Features
 
 - **`PreInvocation` Lifecycle Hook (`hooks.json` -> `scripts/context_monitor.py`)**
-  - **Optimal (`< 85,000` tokens / `< 68%`)**: Outputs `{}`. Zero UI noise and zero token overhead.
-  - **Warning (`85,000 – 104,999` tokens / `68%–84%`)**: Injects an inline progress bar at the top of the response and instructs the agent to delegate heavy log/file exploration to isolated subagents (`invoke_subagent`).
-  - **Critical (`>= 105,000` tokens / `>= 84%`)**: Warns that native `AUTO-COMPACT` will fire within ~20k tokens (or shows exact overshoot) and recommends running `/compact` right after the turn completes.
+  - **Optimal (`< 175,000` tokens / `< 68%`)**: Outputs `{}`. Zero UI noise and zero token overhead.
+  - **Warning (`175,000 – 224,999` tokens / `68%–88%`)**: Injects an inline progress bar once (and every +25k tokens) reminding you to compact only when switching topics, while nudging the agent to delegate heavy log exploration to isolated subagents (`invoke_subagent`).
+  - **Critical (`>= 225,000` tokens / `>= 88%`)**: Warns that native `AUTO-COMPACT` (`~256k`) is ~30k tokens away and recommends running `/compact` after the current task finishes.
   - **Anti-Spam State**: Fires only on `invocationNum <= 1` (never inside multi-step tool loops), tracks alerted brackets in `/tmp/agy-context-guard/<conversationId>.json`, and resets automatically after a manual `/compact` or automatic `CHECKPOINT`.
 - **On-Demand Telemetry Skill (`/context-guard` -> `scripts/context_status.py`)**
   - Reports active context tokens, cache hit ratio (`cache_read_tokens` vs `input_tokens`), steps since last compaction, and a full breakdown of `MANUAL (/compact)` vs `AUTO-COMPACT` checkpoints in the thread.
@@ -39,9 +39,9 @@ Restart Google Antigravity once so the runtime discovers the new plugin bundle. 
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `AGY_COMPACT_CEILING` | `125000` | Empirical token ceiling where Antigravity triggers native `AUTO-COMPACT` |
-| `AGY_COMPACT_WARN` | `85000` | Warning tier threshold (~68% of ceiling) |
-| `AGY_COMPACT_CRIT` | `105000` | Critical tier threshold (~84% of ceiling) |
+| `AGY_COMPACT_CEILING` | `256000` | Empirical token ceiling where Antigravity triggers native `AUTO-COMPACT` on Gemini 4 |
+| `AGY_COMPACT_WARN` | `175000` | Warning tier threshold (~68% of ceiling) |
+| `AGY_COMPACT_CRIT` | `225000` | Critical tier threshold (~88% of ceiling) |
 
 ## Author
 

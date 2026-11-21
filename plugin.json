@@ -1,8 +1,8 @@
 {
   "name": "context-guard",
   "displayName": "Context Guard (Strategic Compact)",
-  "version": "1.0.1",
-  "description": "Monitors session token usage in real time against Antigravity's ~125k auto-compact threshold, displays non-intrusive inline alerts at 68% and 84%, and guides strategic /compact checkpoints.",
+  "version": "1.1.0",
+  "description": "Monitors session token usage in real time against Antigravity's ~256k Gemini 4 auto-compact threshold, displays non-intrusive inline alerts at 175k (68%) and 225k (88%), and guides strategic /compact checkpoints.",
   "author": {
     "name": "Wojciech Marusiak",
     "url": "https://wojcieh.net"
